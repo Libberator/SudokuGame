@@ -3,7 +3,8 @@
 int main()
 {
     SudokuGame game;
-    float deltaTime = 0.0f;
+    float deltaTime;
+
     while (game.isRunning()) 
     {
         deltaTime = game.getDeltaTime();
