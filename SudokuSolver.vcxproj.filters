@@ -18,19 +18,36 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sudoku\Button.cpp">
+    <ClCompile Include="sudoku\CellView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sudoku\SudokuGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sudoku\Cell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sudoku\Group.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sudoku\Button.h">
+    <ClInclude Include="sudoku\CellView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sudoku\SudokuGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sudoku\Cell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sudoku\Group.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\ArchitectsDaughter.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
   </ItemGroup>
 </Project>
