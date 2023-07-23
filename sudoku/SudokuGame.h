@@ -2,10 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include <memory>
 #include "Group.h"
 #include "CellView.h"
-
-using namespace sf; // I know this might be frowned upon, but I'm doing it anyways
 
 class SudokuGame
 {
@@ -25,10 +24,12 @@ public:
 private:
 	// Private Variables
 	
-	RenderWindow _window;
-	Event _event;
-	Clock _clock;
-	Font _font;
+	sf::RenderWindow _window;
+	sf::Event _event;
+	sf::Clock _clock;
+	sf::Font _font;
+	
+	CellView* _selectedView;
 	std::vector<CellView> _cellViews;
 	std::vector<std::shared_ptr<Group>> _rows;
 	std::vector<std::shared_ptr<Group>> _columns;
@@ -38,8 +39,10 @@ private:
 	
 	void initWindow();
 	void initVariables();
-	std::shared_ptr<Group> getOrMakeGroup(std::vector<std::shared_ptr<Group>> groups, int index);
-	void bindCellToView(std::shared_ptr <Cell> cell, int row, int col);
+	std::shared_ptr<Group> getOrMakeGroup(std::vector<std::shared_ptr<Group>>& groups, int index);
+	void bindCellToView(std::shared_ptr<Cell> cell, int row, int col);
 	void pollEvents();
+	void clickedView(CellView& view);
+	void textEntered(int input);
 	bool hasSolvedPuzzle();
 };

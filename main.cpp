@@ -15,23 +15,21 @@ int main()
         game.render();
     }
 
-   /* Group group;
-    Group group2;
+    //std::vector<std::reference_wrapper<Cell>> group;
 
-    for (char i = '1'; i <= '9'; i++)
-    {
-        std::shared_ptr<Cell> sharedCell = std::make_shared<Cell>();
-        sharedCell->element = i;
-        std::cout << "Adding " << i << std::endl;
+    //for (char i = '1'; i <= '9'; i++)
+    //{
+    //    Cell cell(i);
+    //    std::cout << "Adding " << i << std::endl;
 
-        group.add(sharedCell);
-        group2.add(sharedCell);
-    }
+    //    group.push_back(std::ref(cell));
+    //}
 
-    std::cout << group.isSolved() << std::endl;
-    group.cells[8]->element = '0';
-    std::cout << group2.isSolved() << std::endl;
-    group.reset();
+    //std::cout << group[2].get().hasValue() << std::endl;
+    //group[2].get().element = '0';
+    //std::cout << group[2].get().hasValue() << std::endl;
+
+    /*group.reset();
     std::cout << group.isSolved() << std::endl;
     group2.cells[8]->element = '9';
     std::cout << group2.isSolved() << std::endl;*/
