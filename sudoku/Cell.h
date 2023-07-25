@@ -4,13 +4,17 @@
 class Cell
 {
 public:
-	Cell();
-	Cell(char element);
+	Cell(int row, int col, int box);
+	Cell(int row, int col, int box, char value);
 	
-	char element;
+	char value;
+	int row;
+	int col;
+	int box;
 	bool isClue;
 	std::set<char> candidates;
 
+	void setValue(char val, bool isClue);
 	bool hasValue();
 	void reset();
 };

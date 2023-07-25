@@ -20,7 +20,7 @@ bool Group::isSolved()
 	for (auto& cell : cells) 
 	{
 		if (!cell->hasValue()) return false;
-		solvedCopy.remove(cell->element);
+		solvedCopy.remove(cell->value);
 	}
 	if (solvedCopy.size() == 0) return true;
 	return false;

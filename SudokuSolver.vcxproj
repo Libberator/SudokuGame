@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sudoku\CellView.cpp" />
     <ClCompile Include="sudoku\Cell.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="sudoku\SudokuGame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="sudoku\CellView.h" />
     <ClInclude Include="sudoku\Cell.h" />
     <ClInclude Include="sudoku\Group.h" />

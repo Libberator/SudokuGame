@@ -1,43 +1,55 @@
 #include "CellView.h"
 
-static const sf::Vector2f TEXT_OFFSET(18.0f, 12.0f);
+static const sf::Color BG_DEFAULT(230, 230, 230, 255); // default background fill
+static const sf::Color BG_SELECTED(120, 190, 200, 255);
+static const sf::Color BG_SELECTED_SIMILAR(150, 240, 250, 255); // same digit
+static const sf::Color BG_HIGHLIGHTED(200, 250, 250, 255); // rows, cols, boxes
 
-CellView::CellView() { }
+static const sf::Color TEXT_CLUE(0, 0, 0, 255); // should let user know it's not editable
+static const sf::Color TEXT_VALUE(50, 50, 50, 255); // user-entered value
+static const sf::Vector2f TEXT_OFFSET(18.0f, 12.0f);
+static const unsigned int TEXT_VALUE_SIZE = 20;
+static const unsigned int TEXT_CANDIDATE_SIZE = 10;
+
+CellView::CellView() : Button() { }
 
 CellView::CellView(std::shared_ptr<Cell> cell, const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font)
-    : _cell(cell), _position(position), _size(size), _font(font) {}
+    : Button(position, size, font), cell(cell)
+{
+    gridPos = sf::Vector3i(cell->row, cell->col, cell->box);
+}
 
-void CellView::draw(sf::RenderWindow& window)
+void CellView::draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue)
 {
     sf::RectangleShape buttonShape(_size);
-    auto fillColor = _isSelected ? sf::Color(230, 230, 150, 255) : sf::Color(230, 230, 230, 255);
+    auto fillColor = gridPos == selected ? BG_SELECTED :
+        selectedValue != '0' && selectedValue == getValue() ? BG_SELECTED_SIMILAR :
+        selected.x == gridPos.x || selected.y == gridPos.y || selected.z == gridPos.z ? BG_HIGHLIGHTED :
+        BG_DEFAULT;
     buttonShape.setFillColor(fillColor);
     buttonShape.setPosition(_position);
     window.draw(buttonShape);
 
-    sf::Text buttonText(_cell->element, _font, 20);
-    buttonText.setFillColor(sf::Color(50, 50, 50, 255));
-    buttonText.setPosition(_position + TEXT_OFFSET);
-    window.draw(buttonText);
-}
-
-bool CellView::checkClick(const sf::Vector2f& mousePos)
-{
-    if (mousePos.x >= _position.x && mousePos.x < _position.x + _size.x &&
-        mousePos.y >= _position.y && mousePos.y < _position.y + _size.y)
+    if (getValue() != '0') 
     {
-        return true;
+        sf::Text buttonText(getValue(), _font, TEXT_VALUE_SIZE);
+        buttonText.setFillColor(cell->isClue ? TEXT_CLUE : TEXT_VALUE);
+        buttonText.setPosition(_position + TEXT_OFFSET);
+        window.draw(buttonText);
     }
-    return false;
+    else 
+    {
+        // draw any candidates
+    }
 }
 
-void CellView::changeElementTo(char val)
+void CellView::setValue(char val)
 {
-    if (_cell->isClue) return;
-    _cell->element = val;
+    if (cell->isClue) return;
+    cell->value = val;
 }
 
-void CellView::toggleSelect()
+char CellView::getValue()
 {
-    _isSelected = !_isSelected;
+    return cell->value;
 }

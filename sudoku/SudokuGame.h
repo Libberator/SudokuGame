@@ -30,19 +30,21 @@ private:
 	sf::Font _font;
 	
 	CellView* _selectedView;
+	sf::Vector3i _selectedPos; // (row, col, box)
 	std::vector<CellView> _cellViews;
-	std::vector<std::shared_ptr<Group>> _rows;
-	std::vector<std::shared_ptr<Group>> _columns;
-	std::vector<std::shared_ptr<Group>> _boxes;
+	std::vector<Group> _rows;
+	std::vector<Group> _columns;
+	std::vector<Group> _boxes;
 
 	// Private Methods
 	
 	void initWindow();
 	void initVariables();
-	std::shared_ptr<Group> getOrMakeGroup(std::vector<std::shared_ptr<Group>>& groups, int index);
+	Group& getOrMakeGroup(std::vector<Group>& groups, int index);
 	void bindCellToView(std::shared_ptr<Cell> cell, int row, int col);
 	void pollEvents();
-	void clickedView(CellView& view);
+	void mouseButtonPressed(bool leftClick);
+	void clickView(CellView& view);
 	void textEntered(int input);
 	bool hasSolvedPuzzle();
 };
