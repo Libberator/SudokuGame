@@ -1,6 +1,8 @@
 #include "Group.h"
 #include <list>
 
+static const char SOLVED[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
 Group::Group() {}
 
 void Group::add(std::shared_ptr<Cell> cell)
@@ -15,7 +17,7 @@ void Group::reset()
 
 bool Group::isSolved()
 {
-	std::list<char> solvedCopy(solved, solved + std::strlen(solved));
+	std::list<char> solvedCopy(SOLVED, SOLVED + std::strlen(SOLVED));
 
 	for (auto& cell : cells) 
 	{
@@ -25,5 +27,3 @@ bool Group::isSolved()
 	if (solvedCopy.size() == 0) return true;
 	return false;
 }
-
-const char Group::solved[] = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };

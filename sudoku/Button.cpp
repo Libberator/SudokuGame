@@ -12,7 +12,7 @@ Button::Button(const sf::Vector2f& position, const sf::Vector2f& size, const sf:
     this->onClick = onClick;
 }
 
-void Button::draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue)
+void Button::draw(sf::RenderWindow& window)
 {
     sf::RectangleShape buttonShape(_size);
     auto bgFillColor = sf::Color(230, 230, 230, 255);

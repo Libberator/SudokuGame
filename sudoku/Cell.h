@@ -16,5 +16,5 @@ public:
 
 	void setValue(char val, bool isClue);
 	bool hasValue();
-	void reset();
+	void reset(bool hardReset);
 };

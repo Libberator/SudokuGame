@@ -12,6 +12,7 @@ SudokuGame::SudokuGame()
 {
     initWindow();
     initVariables();
+    newGame();
 }
 
 void SudokuGame::initWindow()
@@ -23,15 +24,43 @@ void SudokuGame::initWindow()
     _window.setVerticalSyncEnabled(true);
 }
 
-inline int boxIndex(int row, int col) { return (row / 3) * 3 + (col / 3); }
+inline Group& getOrMakeGroup(std::vector<Group>& groups, int index)
+{
+    if (groups.size() > index)
+        return groups[index];
+    groups.emplace_back();
+    return groups.back();
+}
 
 void SudokuGame::initVariables()
 {
+    //_font.loadFromFile("resources/Gravity-Book.ttf");
     _font.loadFromFile("resources/ArchitectsDaughter.ttf");
 
     _selectedView = nullptr;
     _selectedPos = sf::Vector3i(-1, -1, -1);
+    _writeMode = true;
 
+    createCellGrid();
+    createButtons();
+    createCandidateButtons();
+}
+
+void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int row, int col)
+{
+    auto offset = GRID_OFFSET + sf::Vector2f(row / 3 * CELL_SPACING, col / 3 * CELL_SPACING);
+    auto pos = offset + sf::Vector2f((CELL_SIZE + CELL_SPACING) * row, (CELL_SIZE + CELL_SPACING) * col);
+    sf::Vector2f size(CELL_SIZE, CELL_SIZE);
+
+    CellView view(cell, pos, size, _font);
+    _cellViews.push_back(view);
+}
+
+inline int const boxIndex(const int row, const int col) { return (row / 3) * 3 + (col / 3); }
+
+void SudokuGame::createCellGrid()
+{
+    
     for (int row = 0; row < 9; row++)
     {
         auto& rowGroup = getOrMakeGroup(_rows, row);
@@ -52,22 +81,38 @@ void SudokuGame::initVariables()
     }
 }
 
-Group& SudokuGame::getOrMakeGroup(std::vector<Group>& groups, int index)
+void SudokuGame::createButtons()
 {
-    if (groups.size() > index)
-        return groups[index];
-    groups.emplace_back();
-    return groups.back();
+    Button newGame({ 90.0f, 10.0f }, { 140.0f, 50.0f }, _font, "New Game", [this]() { this->newGame(); });
+    _buttons.push_back(newGame);
+
+    Button resetGame({ 240.0f, 10.0f }, { 90.0f, 50.0f }, _font, "Reset", [this]() { this->resetGame(); });
+    _buttons.push_back(resetGame);
+
+    Button checkSolution({ 340.0f, 10.0f }, { 180.0f, 50.0f }, _font, "Check Solution", [this]() { this->checkSolution(); });
+    _buttons.push_back(checkSolution);
+
+    Button toggleMode({ 590.0f, 140.0f }, { 155.0f, 50.0f }, _font, "Toggle Mode", [this]() { this->toggleMode(); });
+    _buttons.push_back(toggleMode);
 }
 
-void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int row, int col)
+void SudokuGame::createCandidateButtons()
 {
-    auto offset = GRID_OFFSET + sf::Vector2f(row / 3 * CELL_SPACING, col / 3 * CELL_SPACING);
-    auto pos = offset + sf::Vector2f((CELL_SIZE + CELL_SPACING) * row, (CELL_SIZE + CELL_SPACING) * col);
-    sf::Vector2f size(CELL_SIZE, CELL_SIZE);
+    for (int i = 0; i < 9; i++)
+    {
+        auto value = '1' + i;
+        auto xOffset = 65.0f * (i % 3);
+        auto yOffset = 65.0f * (i / 3);
+        sf::Vector2f position(570.0f + xOffset, 210.0f + yOffset);
+        Candidate candidate = Candidate(position, { 60.0f, 60.0f }, _font, std::to_string(i + 1),
+            [this, value]() { this->textEntered(value); }, value);
+        _candidates.push_back(candidate);
+    }
 
-    CellView view(cell, pos, size, _font);
-    _cellViews.push_back(view);
+    // TODO: Add customization for each Button - _defaultTextOffset, _defaultTextSize, etc.
+    Button clearButton = Button({ 635.0f, 405.0f }, { 60.0f, 60.0f }, _font, "  0\n(Clear)",
+        [this]() { this->textEntered('0'); });
+    _buttons.push_back(clearButton);
 }
 
 #pragma endregion
@@ -83,10 +128,18 @@ void SudokuGame::render()
 {
     _window.clear(sf::Color(50, 50, 50, 255));
     
-    // Draw game object
+    // Draw grid cell
     char selectedValue = _selectedView != nullptr ? _selectedView->getValue() : '0';
     for (auto& view : _cellViews)
         view.draw(_window, _selectedPos, selectedValue);
+
+    // Draw buttons
+    for (auto& button : _buttons)
+        button.draw(_window);
+
+    // Draw candidates
+    for (auto& candidate : _candidates)
+        candidate.draw(_window, _writeMode); // give a bool if we're in Write/Sketch mode
 
     _window.display();
 }
@@ -105,20 +158,14 @@ const float SudokuGame::getDeltaTime()
 
 #pragma region Private Methods
 
-// 3 buttons:
-// -New Game (difficulty options?). Two methods: Restart (Reset), Fill with puzzle (check clipboard/file?)
-// -Check Solution (bool toggle?)
+// TODO's:
+// -New Game (difficulty options?). Fill with puzzle (check clipboard/file?)
 // -Solve Puzzle
-
-// Need a way to draw visual candidates, and toggle between writing modes
-// Tab/Space to toggle? 
-// Arrow keys to move selection (wrap around). Store Vector2i for Grid Pos
-// detect backspace or delete to clear cell? Undo button?
-// On keypress, if we have one selected, toggle the digit from Candidates
-// Maybe have a display area of all the possible digits which you can select
-
-// Constraint/Rule
-// For the Cell Candidates, use std::set, and std::set_intersection
+// Arrow keys to move selection (wrap around)
+// detect backspace or delete to clear cell? 
+// Undo button? would require implementing CommandPattern
+// Constraint/Rule <algorithms>
+// For the Cell Candidates, use std::set_intersection to narrow things down
 
 void SudokuGame::pollEvents()
 {
@@ -151,6 +198,12 @@ void SudokuGame::pollEvents()
 
 void SudokuGame::mouseButtonPressed(bool leftClick)
 {
+    if (!leftClick)
+    {
+        toggleMode();
+        return;
+    }
+
     auto pixelPos = sf::Mouse::getPosition(_window);
     sf::Vector2f mousePosf((float)pixelPos.x, (float)pixelPos.y);
 
@@ -163,9 +216,24 @@ void SudokuGame::mouseButtonPressed(bool leftClick)
         }
     }
 
-    // TODO: add checks for other Buttons
+    for (auto& button : _buttons) 
+    {
+        if (button.isClicked(mousePosf)) 
+        {
+            button.onClick();
+            return;
+        }
+    }
 
-    // TODO: add checks for numbers being pressed IF we have something selected
+    if (_selectedView == nullptr) return;
+    for (auto& candidate : _candidates)
+    {
+        if (candidate.isClicked(mousePosf))
+        {
+            candidate.onClick();
+            return;
+        }
+    }
 }
 
 void SudokuGame::clickView(CellView& view)
@@ -182,12 +250,48 @@ void SudokuGame::clickView(CellView& view)
     }
 }
 
-void SudokuGame::textEntered(int input)
+void SudokuGame::textEntered(char input)
 {
     if (_selectedView == nullptr) return;
-    if (_selectedView->cell->isClue) return;
     if (input >= '0' && input <= '9')
-        _selectedView->setValue(input);
+    {
+        if (_writeMode == true)
+            _selectedView->setValue(input, false);
+        else if (!_selectedView->hasValue())
+            _selectedView->toggleCandidate(input);
+    }
+}
+
+void SudokuGame::toggleMode()
+{
+    _writeMode = !_writeMode;
+    printf("Toggle mode\n");
+}
+
+void SudokuGame::newGame()
+{
+    for (auto& view : _cellViews)
+        view.reset(true);
+
+    printf("New Game\n");
+}
+
+void SudokuGame::resetGame()
+{
+    for (auto& view : _cellViews)
+        view.reset(false);
+}
+
+void SudokuGame::checkSolution()
+{
+    if (hasSolvedPuzzle()) 
+    {
+        printf("Solved!\n"); // TODO: victory screen
+    }
+    else
+    {
+        printf("Not solved yet\n"); // TODO: display message
+    }
 }
 
 bool SudokuGame::hasSolvedPuzzle()

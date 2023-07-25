@@ -13,7 +13,4 @@ public:
 	void add(std::shared_ptr<Cell> cell);
 	void reset();
 	bool isSolved();
-
-private:
-	static const char solved[];
 };
