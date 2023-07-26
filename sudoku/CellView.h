@@ -12,11 +12,11 @@ public:
 
     void reset(bool hardReset);
     void draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue);
-    bool hasValue();
-    void setValue(char val, bool isClue);
-    char getValue();
-    void toggleCandidate(char input);
     bool isClue();
+    bool hasValue();
+    char getValue();
+    void setValue(char val, bool isClue);
+    void toggleCandidate(char input);
 
     sf::Vector3i gridPos; // (col, row, box)
     

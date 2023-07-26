@@ -41,6 +41,8 @@ private:
 	void checkSolution();
 	bool hasSolvedPuzzle();
 	
+	// Variables
+
 	sf::RenderWindow _window;
 	sf::Event _event;
 	sf::Clock _clock;
@@ -55,4 +57,7 @@ private:
 	std::vector<Group> _rows;
 	std::vector<Group> _boxes;
 	bool _writeMode;
+	float _runTime;
+	float _checkEndTime;
+	sf::Text _checkResult;
 };

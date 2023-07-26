@@ -21,10 +21,7 @@ CellView::CellView(std::shared_ptr<Cell> cell, const sf::Vector2f& position, con
     text.setPosition(position + TEXT_OFFSET);
 }
 
-void CellView::reset(bool hardReset)
-{
-    _cell->reset(hardReset);
-}
+void CellView::reset(bool hardReset) { _cell->reset(hardReset); }
 
 void CellView::draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue)
 {
@@ -59,20 +56,13 @@ void CellView::draw(sf::RenderWindow& window, sf::Vector3i selected, char select
     }
 }
 
-bool CellView::hasValue()
-{
-    return _cell->hasValue();
-}
+bool CellView::isClue() { return _cell->isClue; }
 
-void CellView::setValue(char val, bool isClue)
-{
-    _cell->setValue(val, isClue);
-}
+bool CellView::hasValue() { return _cell->hasValue(); }
 
-char CellView::getValue()
-{
-    return _cell->value;
-}
+char CellView::getValue() { return _cell->value; }
+
+void CellView::setValue(char val, bool isClue) { _cell->setValue(val, isClue); }
 
 void CellView::toggleCandidate(char input)
 {
@@ -86,9 +76,4 @@ void CellView::toggleCandidate(char input)
         _cell->candidates.erase(input);
     else
         _cell->candidates.insert(input);
-}
-
-bool CellView::isClue()
-{
-    return _cell->isClue;
 }

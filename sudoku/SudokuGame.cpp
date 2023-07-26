@@ -1,8 +1,9 @@
 #include "SudokuGame.h"
 #include <iostream>
+#include <random>
 
-static const float VIEW_HEIGHT = 600.0f;
-static const float VIEW_WIDTH = 800.0f;
+static const unsigned int VIEW_HEIGHT = 600;
+static const unsigned int VIEW_WIDTH = 800;
 static const float CELL_SIZE = 50.0f;
 static const float CELL_SPACING = 2.0f;
 static const sf::Vector2f GRID_OFFSET(70.0f, 70.0f);
@@ -45,6 +46,10 @@ void SudokuGame::initVariables()
     createCellGrid();
     createButtons();
     createCandidateButtons();
+
+    _checkResult.setFont(_font);
+    _checkResult.setCharacterSize(20);
+    _checkResult.setPosition({ 540.0f, 22.0f });
 }
 
 void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int col, int row)
@@ -109,8 +114,7 @@ void SudokuGame::createCandidateButtons()
         _candidates.push_back(candidate);
     }
 
-    // TODO: Add customization for each Button - _defaultTextOffset, _defaultTextSize, etc.
-    Button clearButton = Button({ 635.0f, 405.0f }, { 60.0f, 60.0f }, { 5.0f, 6.0f }, _font, "   0\n(Clear)",
+    Button clearButton = Button({ 635.0f, 405.0f }, { 60.0f, 60.0f }, { 6.0f, 10.0f }, _font, "   0\n(Clear)",
         [this]() { this->textEntered('0'); });
     clearButton.text.setCharacterSize(16);
     _buttons.push_back(clearButton);
@@ -122,6 +126,7 @@ void SudokuGame::createCandidateButtons()
 
 void SudokuGame::update(float dt)
 {
+    _runTime += dt;
     pollEvents();
 }
 
@@ -142,6 +147,10 @@ void SudokuGame::render()
     for (auto& candidate : _candidates)
         candidate.draw(_window, _writeMode); // give a bool if we're in Write/Sketch mode
 
+    // Draw check result for a short duration after button's clicked
+    if (_checkEndTime > _runTime) 
+        _window.draw(_checkResult);
+
     _window.display();
 }
 
@@ -158,13 +167,6 @@ const float SudokuGame::getDeltaTime()
 #pragma endregion
 
 #pragma region Private Methods
-
-// TODO's:
-// -New Game (difficulty options?). Fill with puzzle (check clipboard/file?)
-// -Solve Puzzle
-// Undo button? would require implementing Command Pattern. not a priority
-// Constraint/Rule <algorithms>
-// For the Cell Candidates, use std::set_intersection to narrow things down
 
 void SudokuGame::pollEvents()
 {
@@ -242,8 +244,8 @@ void SudokuGame::arrowKeyPressed(sf::Vector2i dir)
 {
     if (_selectedView == nullptr) return;
     
-    int col = clampAndLoop(_selectedPos.x + dir.x, _columns.size());
-    int row = clampAndLoop(_selectedPos.y + dir.y, _rows.size());
+    int col = clampAndLoop(_selectedPos.x + dir.x, (int)_columns.size());
+    int row = clampAndLoop(_selectedPos.y + dir.y, (int)_rows.size());
     int index = row * 9 + col;
     clickView(_cellViews[index]);
 }
@@ -265,6 +267,7 @@ void SudokuGame::clickView(CellView& view)
 void SudokuGame::textEntered(char input)
 {
     if (_selectedView == nullptr) return;
+    if (_selectedView->isClue()) return;
     if (input >= '0' && input <= '9')
     {
         if (_writeMode == true)
@@ -276,12 +279,31 @@ void SudokuGame::textEntered(char input)
 
 void SudokuGame::toggleMode() { _writeMode = !_writeMode; }
 
+int getRandomNumber(int min, int maxInclusive) 
+{
+    std::random_device rng;
+    std::mt19937_64 gen(rng());
+    std::uniform_int_distribution<int> distribution(min, maxInclusive);
+    return distribution(gen);
+}
+
 void SudokuGame::newGame()
 {
     for (auto& view : _cellViews)
         view.reset(true);
 
-    printf("New Game\n");
+    int rng = getRandomNumber(0, 99);
+
+    std::string puzzle;
+    puzzle.resize(81);
+    
+    sf::FileInputStream stream;
+    stream.open("resources/puzzles.csv");
+    stream.seek(rng * 165);
+    stream.read(const_cast<char*>(puzzle.data()), 81);
+    
+    for (int i = 0; i < 81; i++)
+        _cellViews[i].setValue(puzzle[i], true);
 }
 
 void SudokuGame::resetGame()
@@ -294,12 +316,16 @@ void SudokuGame::checkSolution()
 {
     if (hasSolvedPuzzle()) 
     {
-        printf("Solved!\n"); // TODO: victory screen
+        _checkResult.setFillColor({ 50, 250, 50, 255 });
+        _checkResult.setString("SOLVED!");
     }
-    else
+    else 
     {
-        printf("Not solved yet\n"); // TODO: display message
+        _checkResult.setFillColor({ 250, 50, 50, 255 });
+        _checkResult.setString("Not solved");
     }
+    
+    _checkEndTime = _runTime + 2.0f;
 }
 
 bool SudokuGame::hasSolvedPuzzle()
