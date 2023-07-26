@@ -1,5 +1,4 @@
 #include "SudokuGame.h"
-#include <iostream>
 #include <random>
 
 static const unsigned int VIEW_HEIGHT = 600;
@@ -36,7 +35,6 @@ inline Group& getOrMakeGroup(std::vector<Group>& groups, int index)
 
 void SudokuGame::initVariables()
 {
-    //_font.loadFromFile("resources/Gravity-Book.ttf");
     _font.loadFromFile("resources/ArchitectsDaughter.ttf");
 
     _selectedView = nullptr;
@@ -277,9 +275,9 @@ void SudokuGame::textEntered(char input)
     }
 }
 
-void SudokuGame::toggleMode() { _writeMode = !_writeMode; }
+inline void SudokuGame::toggleMode() { _writeMode = !_writeMode; }
 
-int getRandomNumber(int min, int maxInclusive) 
+static int const getRandomNumber(const int& min, const int& maxInclusive) 
 {
     std::random_device rng;
     std::mt19937_64 gen(rng());
