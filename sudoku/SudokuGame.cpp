@@ -1,4 +1,5 @@
 #include "SudokuGame.h"
+#include <iostream>
 
 static const float VIEW_HEIGHT = 600.0f;
 static const float VIEW_WIDTH = 800.0f;
@@ -46,21 +47,20 @@ void SudokuGame::initVariables()
     createCandidateButtons();
 }
 
-void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int row, int col)
+void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int col, int row)
 {
-    auto offset = GRID_OFFSET + sf::Vector2f(row / 3 * CELL_SPACING, col / 3 * CELL_SPACING);
-    auto pos = offset + sf::Vector2f((CELL_SIZE + CELL_SPACING) * row, (CELL_SIZE + CELL_SPACING) * col);
+    auto offset = GRID_OFFSET + sf::Vector2f(col / 3 * CELL_SPACING, row / 3 * CELL_SPACING);
+    auto pos = offset + sf::Vector2f((CELL_SIZE + CELL_SPACING) * col, (CELL_SIZE + CELL_SPACING) * row);
     sf::Vector2f size(CELL_SIZE, CELL_SIZE);
 
     CellView view(cell, pos, size, _font);
     _cellViews.push_back(view);
 }
 
-inline int const boxIndex(const int row, const int col) { return (row / 3) * 3 + (col / 3); }
+inline int const boxIndex(const int col, const int row) { return (col / 3) + (row / 3) * 3; }
 
 void SudokuGame::createCellGrid()
 {
-    
     for (int row = 0; row < 9; row++)
     {
         auto& rowGroup = getOrMakeGroup(_rows, row);
@@ -68,31 +68,31 @@ void SudokuGame::createCellGrid()
         {
             auto& colGroup = getOrMakeGroup(_columns, col);
 
-            auto box = boxIndex(row, col);
+            auto box = boxIndex(col, row);
             auto& boxGroup = getOrMakeGroup(_boxes, box);
 
-            auto cell = std::make_shared<Cell>(row, col, box);
+            auto cell = std::make_shared<Cell>(col, row, box);
             rowGroup.cells.push_back(cell);
             colGroup.cells.push_back(cell);
             boxGroup.cells.push_back(cell);
 
-            bindCellToView(cell, row, col);
+            bindCellToView(cell, col, row);
         }
     }
 }
 
 void SudokuGame::createButtons()
 {
-    Button newGame({ 90.0f, 10.0f }, { 140.0f, 50.0f }, _font, "New Game", [this]() { this->newGame(); });
+    Button newGame({ 100.0f, 10.0f }, { 135.0f, 50.0f }, _font, "New Game", [this]() { this->newGame(); });
     _buttons.push_back(newGame);
 
-    Button resetGame({ 240.0f, 10.0f }, { 90.0f, 50.0f }, _font, "Reset", [this]() { this->resetGame(); });
+    Button resetGame({ 245.0f, 10.0f }, { 90.0f, 50.0f }, _font, "Reset", [this]() { this->resetGame(); });
     _buttons.push_back(resetGame);
 
-    Button checkSolution({ 340.0f, 10.0f }, { 180.0f, 50.0f }, _font, "Check Solution", [this]() { this->checkSolution(); });
+    Button checkSolution({ 345.0f, 10.0f }, { 180.0f, 50.0f }, _font, "Check Solution", [this]() { this->checkSolution(); });
     _buttons.push_back(checkSolution);
 
-    Button toggleMode({ 590.0f, 140.0f }, { 155.0f, 50.0f }, _font, "Toggle Mode", [this]() { this->toggleMode(); });
+    Button toggleMode({ 605.0f, 150.0f }, { 120.0f, 50.0f }, _font, "Pencil/Ink", [this]() { this->toggleMode(); });
     _buttons.push_back(toggleMode);
 }
 
@@ -110,8 +110,9 @@ void SudokuGame::createCandidateButtons()
     }
 
     // TODO: Add customization for each Button - _defaultTextOffset, _defaultTextSize, etc.
-    Button clearButton = Button({ 635.0f, 405.0f }, { 60.0f, 60.0f }, _font, "  0\n(Clear)",
+    Button clearButton = Button({ 635.0f, 405.0f }, { 60.0f, 60.0f }, { 5.0f, 6.0f }, _font, "   0\n(Clear)",
         [this]() { this->textEntered('0'); });
+    clearButton.text.setCharacterSize(16);
     _buttons.push_back(clearButton);
 }
 
@@ -161,9 +162,7 @@ const float SudokuGame::getDeltaTime()
 // TODO's:
 // -New Game (difficulty options?). Fill with puzzle (check clipboard/file?)
 // -Solve Puzzle
-// Arrow keys to move selection (wrap around)
-// detect backspace or delete to clear cell? 
-// Undo button? would require implementing CommandPattern
+// Undo button? would require implementing Command Pattern. not a priority
 // Constraint/Rule <algorithms>
 // For the Cell Candidates, use std::set_intersection to narrow things down
 
@@ -174,18 +173,19 @@ void SudokuGame::pollEvents()
         switch (_event.type)
         {
         case sf::Event::MouseButtonPressed:
-            // NOTE: this will pass if you're holding in left-button, but click right-button :/
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            if (_event.mouseButton.button == sf::Mouse::Left)
                 mouseButtonPressed(true);
-            else if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) 
+            else if (_event.mouseButton.button == sf::Mouse::Right)
                 mouseButtonPressed(false);
-            break;
-        case sf::Event::MouseButtonReleased:
-            break;
-        case sf::Event::MouseMoved:
             break;
         case sf::Event::TextEntered:
             textEntered(_event.text.unicode);
+            break;
+        case sf::Event::KeyPressed:
+            if (_event.key.code == sf::Keyboard::Right) arrowKeyPressed(sf::Vector2i(1, 0));
+            else if (_event.key.code == sf::Keyboard::Left) arrowKeyPressed(sf::Vector2i(-1, 0));
+            else if (_event.key.code == sf::Keyboard::Up) arrowKeyPressed(sf::Vector2i(0, -1));
+            else if (_event.key.code == sf::Keyboard::Down) arrowKeyPressed(sf::Vector2i(0, 1));
             break;
         case sf::Event::Closed:
             _window.close();
@@ -236,6 +236,18 @@ void SudokuGame::mouseButtonPressed(bool leftClick)
     }
 }
 
+inline int clampAndLoop(int index, int max) { return (index + max) % max; }
+
+void SudokuGame::arrowKeyPressed(sf::Vector2i dir)
+{
+    if (_selectedView == nullptr) return;
+    
+    int col = clampAndLoop(_selectedPos.x + dir.x, _columns.size());
+    int row = clampAndLoop(_selectedPos.y + dir.y, _rows.size());
+    int index = row * 9 + col;
+    clickView(_cellViews[index]);
+}
+
 void SudokuGame::clickView(CellView& view)
 {
     if (_selectedView == &view)
@@ -262,11 +274,7 @@ void SudokuGame::textEntered(char input)
     }
 }
 
-void SudokuGame::toggleMode()
-{
-    _writeMode = !_writeMode;
-    printf("Toggle mode\n");
-}
+void SudokuGame::toggleMode() { _writeMode = !_writeMode; }
 
 void SudokuGame::newGame()
 {

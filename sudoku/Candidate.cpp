@@ -14,15 +14,11 @@ Candidate::Candidate(const sf::Vector2f& position, const sf::Vector2f& size, con
 
 void Candidate::draw(sf::RenderWindow& window, bool writeMode)
 {
-    sf::RectangleShape buttonShape(_size);
-    auto bgFillColor = sf::Color(230, 230, 230, 255);
-    buttonShape.setFillColor(bgFillColor);
-    buttonShape.setPosition(_position);
-    window.draw(buttonShape);
+    auto textPos = position + (writeMode ? CENTERED_OFFSET : _offset);
+    auto textSize = writeMode ? 32 : 15;
 
-    sf::Text buttonText(_label, _font, writeMode ? 32 : 15);
-    auto textFillColor = sf::Color(50, 50, 50, 255);
-    buttonText.setFillColor(textFillColor);
-    buttonText.setPosition(_position + (writeMode ? CENTERED_OFFSET : _offset));
-    window.draw(buttonText);
+    text.setPosition(textPos);
+    text.setCharacterSize(textSize);
+
+    Button::draw(window);
 }

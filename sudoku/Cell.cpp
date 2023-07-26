@@ -1,8 +1,8 @@
 #include "Cell.h"
 
-Cell::Cell(int row, int col, int box) : Cell(row, col, box, '0') {}
+Cell::Cell(int col, int row, int box) : Cell(col, row, box, '0') {}
 
-Cell::Cell(int row, int col, int box, char value) : row(row), col(col), box(box), value(value)
+Cell::Cell(int col, int row, int box, char value) : col(col), row(row), box(box), value(value)
 {
 	isClue = value != '0';
 	reset(false);

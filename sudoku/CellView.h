@@ -15,10 +15,10 @@ public:
     bool hasValue();
     void setValue(char val, bool isClue);
     char getValue();
-    void toggleCandidate(char candidate);
+    void toggleCandidate(char input);
     bool isClue();
 
-    sf::Vector3i gridPos; // (row, col, box)
+    sf::Vector3i gridPos; // (col, row, box)
     
 private:
     std::shared_ptr<Cell> _cell;

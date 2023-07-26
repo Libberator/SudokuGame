@@ -4,12 +4,12 @@
 class Cell
 {
 public:
-	Cell(int row, int col, int box);
-	Cell(int row, int col, int box, char value);
+	Cell(int col, int row, int box);
+	Cell(int col, int row, int box, char value);
 	
 	char value;
-	int row;
 	int col;
+	int row;
 	int box;
 	bool isClue;
 	std::set<char> candidates;

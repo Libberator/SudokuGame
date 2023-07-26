@@ -23,7 +23,7 @@ private:
 	
 	void initWindow();
 	void initVariables();
-	void bindCellToView(std::shared_ptr<Cell> cell, int row, int col);
+	void bindCellToView(std::shared_ptr<Cell> cell, int col, int row);
 	void createCellGrid();
 	void createButtons();
 	void createCandidateButtons();
@@ -32,6 +32,7 @@ private:
 
 	void pollEvents();
 	void mouseButtonPressed(bool leftClick);
+	void arrowKeyPressed(sf::Vector2i dir);
 	void clickView(CellView& view);
 	void textEntered(char input);
 	void toggleMode();
@@ -45,13 +46,13 @@ private:
 	sf::Clock _clock;
 	sf::Font _font;
 	
-	sf::Vector3i _selectedPos; // (row, col, box)
+	sf::Vector3i _selectedPos; // (col, row, box)
 	CellView* _selectedView;
 	std::vector<CellView> _cellViews;
 	std::vector<Button> _buttons;
 	std::vector<Candidate> _candidates;
-	std::vector<Group> _rows;
 	std::vector<Group> _columns;
+	std::vector<Group> _rows;
 	std::vector<Group> _boxes;
 	bool _writeMode;
 };
