@@ -152,6 +152,9 @@
   <ItemGroup>
     <Font Include="resources\ArchitectsDaughter.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\puzzles.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
