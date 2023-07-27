@@ -3,12 +3,10 @@
 int main()
 {
     SudokuGame game;
-    float deltaTime;
 
     while (game.isRunning()) 
     {
-        deltaTime = game.getDeltaTime();
-        game.update(deltaTime);
+        game.update(game.getDeltaTime());
         game.render();
     }
 

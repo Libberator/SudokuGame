@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sudoku\CellView.cpp">
+    <ClCompile Include="sudoku\CellViewButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sudoku\SudokuGame.cpp">
@@ -33,12 +33,12 @@
     <ClCompile Include="sudoku\Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sudoku\Candidate.cpp">
+    <ClCompile Include="sudoku\CellInputButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sudoku\CellView.h">
+    <ClInclude Include="sudoku\CellViewButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sudoku\SudokuGame.h">
@@ -50,7 +50,7 @@
     <ClInclude Include="sudoku\Group.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sudoku\Candidate.h">
+    <ClInclude Include="sudoku\CellInputButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sudoku\Button.h">

@@ -4,11 +4,10 @@
 #include "Button.h"
 #include "Cell.h"
 
-class CellView : public Button
+struct CellViewButton : public Button
 {
-public:
-    CellView();
-    CellView(std::shared_ptr<Cell> cell, const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font);
+    CellViewButton();
+    CellViewButton(std::shared_ptr<Cell> cell, const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font);
 
     void reset(bool hardReset);
     void draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue);

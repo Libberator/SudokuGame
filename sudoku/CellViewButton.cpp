@@ -1,4 +1,4 @@
-#include "CellView.h"
+#include "CellViewButton.h"
 
 static const sf::Color BG_DEFAULT(230, 230, 230, 255); // default background fill
 static const sf::Color BG_SELECTED(120, 190, 200, 255);
@@ -10,9 +10,9 @@ static const sf::Vector2f TEXT_OFFSET(16.0f, 6.0f);
 static const unsigned int TEXT_VALUE_SIZE = 30;
 static const unsigned int TEXT_CANDIDATE_SIZE = 11;
 
-CellView::CellView() : Button() { }
+CellViewButton::CellViewButton() : Button() { }
 
-CellView::CellView(std::shared_ptr<Cell> cell, const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font)
+CellViewButton::CellViewButton(std::shared_ptr<Cell> cell, const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font)
     : Button(position, size, font), _cell(cell)
 {
     gridPos = sf::Vector3i(cell->col, cell->row, cell->box);
@@ -21,9 +21,9 @@ CellView::CellView(std::shared_ptr<Cell> cell, const sf::Vector2f& position, con
     text.setPosition(position + TEXT_OFFSET);
 }
 
-void CellView::reset(bool hardReset) { _cell->reset(hardReset); }
+void CellViewButton::reset(bool hardReset) { _cell->reset(hardReset); }
 
-void CellView::draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue)
+void CellViewButton::draw(sf::RenderWindow& window, sf::Vector3i selected, char selectedValue)
 {
     auto fillColor = gridPos == selected ? BG_SELECTED :
         selectedValue != '0' && selectedValue == getValue() ? BG_SELECTED_SIMILAR :
@@ -56,15 +56,15 @@ void CellView::draw(sf::RenderWindow& window, sf::Vector3i selected, char select
     }
 }
 
-bool CellView::isClue() { return _cell->isClue; }
+bool CellViewButton::isClue() { return _cell->isClue; }
 
-bool CellView::hasValue() { return _cell->hasValue(); }
+bool CellViewButton::hasValue() { return _cell->hasValue(); }
 
-char CellView::getValue() { return _cell->value; }
+char CellViewButton::getValue() { return _cell->value; }
 
-void CellView::setValue(char val, bool isClue) { _cell->setValue(val, isClue); }
+void CellViewButton::setValue(char val, bool isClue) { _cell->setValue(val, isClue); }
 
-void CellView::toggleCandidate(char input)
+void CellViewButton::toggleCandidate(char input)
 {
     if (input == '0') 
     {

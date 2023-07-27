@@ -1,9 +1,8 @@
 #pragma once
 #include <set>
 
-class Cell
+struct Cell
 {
-public:
 	Cell(int col, int row, int box);
 	Cell(int col, int row, int box, char value);
 	

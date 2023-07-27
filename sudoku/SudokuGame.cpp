@@ -39,15 +39,15 @@ void SudokuGame::initVariables()
 
     _selectedView = nullptr;
     _selectedPos = sf::Vector3i(-1, -1, -1);
-    _writeMode = true;
+    _penOrPencil = true;
 
     createCellGrid();
     createButtons();
     createCandidateButtons();
 
-    _checkResult.setFont(_font);
-    _checkResult.setCharacterSize(20);
-    _checkResult.setPosition({ 540.0f, 22.0f });
+    _checkResultText.setFont(_font);
+    _checkResultText.setCharacterSize(20);
+    _checkResultText.setPosition({ 540.0f, 22.0f });
 }
 
 void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int col, int row)
@@ -56,7 +56,7 @@ void SudokuGame::bindCellToView(std::shared_ptr<Cell> cell, int col, int row)
     auto pos = offset + sf::Vector2f((CELL_SIZE + CELL_SPACING) * col, (CELL_SIZE + CELL_SPACING) * row);
     sf::Vector2f size(CELL_SIZE, CELL_SIZE);
 
-    CellView view(cell, pos, size, _font);
+    CellViewButton view(cell, pos, size, _font);
     _cellViews.push_back(view);
 }
 
@@ -107,9 +107,9 @@ void SudokuGame::createCandidateButtons()
         auto xOffset = 65.0f * (i % 3);
         auto yOffset = 65.0f * (i / 3);
         sf::Vector2f position(570.0f + xOffset, 210.0f + yOffset);
-        Candidate candidate = Candidate(position, { 60.0f, 60.0f }, _font, std::to_string(i + 1),
+        CellInputButton cellInput(position, { 60.0f, 60.0f }, _font, std::to_string(i + 1),
             [this, value]() { this->textEntered(value); }, value);
-        _candidates.push_back(candidate);
+        _cellInputs.push_back(cellInput);
     }
 
     Button clearButton = Button({ 635.0f, 405.0f }, { 60.0f, 60.0f }, { 6.0f, 10.0f }, _font, "   0\n(Clear)",
@@ -137,17 +137,17 @@ void SudokuGame::render()
     for (auto& view : _cellViews)
         view.draw(_window, _selectedPos, selectedValue);
 
+    // Draw cell inputs
+    for (auto& cellInput : _cellInputs)
+        cellInput.draw(_window, _penOrPencil); // give a bool if we're in Write/Sketch mode
+    
     // Draw buttons
     for (auto& button : _buttons)
         button.draw(_window);
 
-    // Draw candidates
-    for (auto& candidate : _candidates)
-        candidate.draw(_window, _writeMode); // give a bool if we're in Write/Sketch mode
-
     // Draw check result for a short duration after button's clicked
     if (_checkEndTime > _runTime) 
-        _window.draw(_checkResult);
+        _window.draw(_checkResultText);
 
     _window.display();
 }
@@ -226,11 +226,11 @@ void SudokuGame::mouseButtonPressed(bool leftClick)
     }
 
     if (_selectedView == nullptr) return;
-    for (auto& candidate : _candidates)
+    for (auto& cellInput : _cellInputs)
     {
-        if (candidate.isClicked(mousePosf))
+        if (cellInput.isClicked(mousePosf))
         {
-            candidate.onClick();
+            cellInput.onClick();
             return;
         }
     }
@@ -248,7 +248,7 @@ void SudokuGame::arrowKeyPressed(sf::Vector2i dir)
     clickView(_cellViews[index]);
 }
 
-void SudokuGame::clickView(CellView& view)
+void SudokuGame::clickView(CellViewButton& view)
 {
     if (_selectedView == &view)
     {
@@ -268,14 +268,14 @@ void SudokuGame::textEntered(char input)
     if (_selectedView->isClue()) return;
     if (input >= '0' && input <= '9')
     {
-        if (_writeMode == true)
+        if (_penOrPencil == true)
             _selectedView->setValue(input, false);
         else if (!_selectedView->hasValue())
             _selectedView->toggleCandidate(input);
     }
 }
 
-inline void SudokuGame::toggleMode() { _writeMode = !_writeMode; }
+inline void SudokuGame::toggleMode() { _penOrPencil = !_penOrPencil; }
 
 static int const getRandomNumber(const int& min, const int& maxInclusive) 
 {
@@ -314,13 +314,13 @@ void SudokuGame::checkSolution()
 {
     if (hasSolvedPuzzle()) 
     {
-        _checkResult.setFillColor({ 50, 250, 50, 255 });
-        _checkResult.setString("SOLVED!");
+        _checkResultText.setFillColor({ 50, 250, 50, 255 });
+        _checkResultText.setString("SOLVED!");
     }
     else 
     {
-        _checkResult.setFillColor({ 250, 50, 50, 255 });
-        _checkResult.setString("Not solved");
+        _checkResultText.setFillColor({ 250, 50, 50, 255 });
+        _checkResultText.setString("Not solved");
     }
     
     _checkEndTime = _runTime + 2.0f;

@@ -3,9 +3,8 @@
 #include <vector>
 #include <memory>
 
-class Group
+struct Group
 {
-public:
 	Group();
 
 	std::vector<std::shared_ptr<Cell>> cells;

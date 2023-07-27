@@ -4,8 +4,8 @@
 #include <SFML/Window.hpp>
 #include <memory>
 #include "Group.h"
-#include "CellView.h"
-#include "Candidate.h"
+#include "CellViewButton.h"
+#include "CellInputButton.h"
 
 class SudokuGame
 {
@@ -33,7 +33,7 @@ private:
 	void pollEvents();
 	void mouseButtonPressed(bool leftClick);
 	void arrowKeyPressed(sf::Vector2i dir);
-	void clickView(CellView& view);
+	void clickView(CellViewButton& view);
 	void textEntered(char input);
 	void toggleMode();
 	void newGame();
@@ -49,15 +49,15 @@ private:
 	sf::Font _font;
 	
 	sf::Vector3i _selectedPos; // (col, row, box)
-	CellView* _selectedView;
-	std::vector<CellView> _cellViews;
+	CellViewButton* _selectedView;
+	std::vector<CellViewButton> _cellViews;
+	std::vector<CellInputButton> _cellInputs;
 	std::vector<Button> _buttons;
-	std::vector<Candidate> _candidates;
 	std::vector<Group> _columns;
 	std::vector<Group> _rows;
 	std::vector<Group> _boxes;
-	bool _writeMode;
+	bool _penOrPencil; // true = pen, false = pencil
 	float _runTime;
 	float _checkEndTime;
-	sf::Text _checkResult;
+	sf::Text _checkResultText;
 };

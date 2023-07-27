@@ -2,9 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 
-class Button
+struct Button
 {
-public:
 	Button();
 	Button(const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font);
 	Button(const sf::Vector2f& position, const sf::Vector2f& size, const sf::Vector2f& textOffset, const sf::Font& font);

@@ -135,16 +135,16 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sudoku\Button.cpp" />
-    <ClCompile Include="sudoku\Candidate.cpp" />
-    <ClCompile Include="sudoku\CellView.cpp" />
+    <ClCompile Include="sudoku\CellInputButton.cpp" />
+    <ClCompile Include="sudoku\CellViewButton.cpp" />
     <ClCompile Include="sudoku\Cell.cpp" />
     <ClCompile Include="sudoku\Group.cpp" />
     <ClCompile Include="sudoku\SudokuGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sudoku\Button.h" />
-    <ClInclude Include="sudoku\Candidate.h" />
-    <ClInclude Include="sudoku\CellView.h" />
+    <ClInclude Include="sudoku\CellInputButton.h" />
+    <ClInclude Include="sudoku\CellViewButton.h" />
     <ClInclude Include="sudoku\Cell.h" />
     <ClInclude Include="sudoku\Group.h" />
     <ClInclude Include="sudoku\SudokuGame.h" />
